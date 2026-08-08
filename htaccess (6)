@@ -1,0 +1,31 @@
+Options -MultiViews
+DirectoryIndex index.php index.html index.htm
+
+RewriteEngine On
+RewriteBase /
+
+# 1. Uploaded files ko direct public access se protect karo.
+RewriteRule ^sites(?:/|$) - [F,L]
+
+# 2. Hosting panel aur router ko dobara view.php mein mat bhejo.
+RewriteRule ^(?:index|view)\.php$ - [L]
+
+# 3. Root ki asli files/folders ko normally serve hone do.
+# Is se panel ki CSS, JS, favicon waghera kaam karte hain.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 4. Hosted project ke clean URLs router ko bhejo.
+# /hostingwebsite/                  -> view.php?site=hostingwebsite
+# /hostingwebsite/login.php         -> view.php?site=hostingwebsite/login.php
+# /hostingwebsite/assets/style.css  -> view.php?site=hostingwebsite/assets/style.css
+RewriteRule ^([A-Za-z0-9_-][A-Za-z0-9_./-]*)/?$ view.php?site=$1 [QSA,L,NE]
+
+# InfinityFree par php_value kabhi 500 error de sakta hai, is liye
+# inhein pehle commented rakha gaya hai. Agar hosting support kare to
+# ek-ek karke uncomment kar sakte hain:
+# php_value upload_max_filesize 64M
+# php_value post_max_size 68M
+# php_value max_execution_time 300
+# php_value memory_limit 256M
